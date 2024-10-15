@@ -1,7 +1,39 @@
+/********************************************************************************
+* WEB322 – Assignment 03
+*
+* I declare that this assignment is my own work in accordance with Seneca's
+* Academic Integrity Policy:
+*
+* https://www.senecacollege.ca/about/policies/academic-integrity-policy.html
+*
+* Name: ______________________ Student ID: ______________ Date: ______________
+*
+* Published URL: ___________________________________________________________
+*
+********************************************************************************/
+
 const legoData = require('./modules/legoSets') 
 const express = require('express'); 
 const app = express();
-const PORT = process.env.PORT || 8080; 
+const path = require('path');
+const PORT = process.env.PORT || 8080; // Vercel Link: 
+
+app.use(express.static(path.join(__dirname, "public")));
+
+
+  app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "views", "home.html"));
+  });
+
+  app.get("/about", (req, res) => {
+    res.sendFile(path.join(__dirname, "views", "about.html"));
+  });
+  
+  app.get("/", (req, res) => {
+    res.send("Assignment 3: Abdalla Abdelgadir - 113734198");
+  });
+
+
 
 legoData.initialize()
     .then(() => {
@@ -23,11 +55,17 @@ app.get("/lego/sets", (req, res) => {
         .catch(error => res.status(500).send(error))
 })
 
-app.get("/lego/sets/num-demo", (req, res) => {
-    legoData.getSetByNum("001-1") 
-        .then(set => res.json(set))
-        .catch(error => res.status(404).send(error))
-})
+app.get("/lego/sets/:set_num", (req, res) => {
+
+    legoData.initialize().then(() => {
+        legoData.getSetByNum(req.params.set_num).then((sets=> {
+            res.send(sets); 
+        }))
+        .catch((err) => {
+            res.send(err); 
+        }); 
+    }); 
+  }); 
 
 app.get("/lego/sets/theme-demo", (req, res) => {
     legoData.getSetsByTheme("town")
@@ -35,8 +73,9 @@ app.get("/lego/sets/theme-demo", (req, res) => {
         .catch(error => res.status(404).send(error))
 })
 
+/*
 async function run() {
-    await legoData.initialize()
+    await legoData.initialize() // testing functions
 
     const allSets = legoData.getAllSets()
     console.log(allSets)
@@ -46,3 +85,4 @@ async function run() {
 }
 
 run().catch(console.error)
+*/
