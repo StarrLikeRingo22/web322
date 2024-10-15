@@ -6,7 +6,7 @@
 *
 * https://www.senecacollege.ca/about/policies/academic-integrity-policy.html
 *
-* Name: ______________________ Student ID: ______________ Date: ______________
+* Name: Abdalla Abdelgadir       Student ID: 113734198      Date: 2024-10-15
 *
 * Published URL: ___________________________________________________________
 *
@@ -46,7 +46,7 @@ legoData.initialize()
     })
 
 app.get("/", (req, res) => {
-    res.send("Assignment 2: Abdalla Abdelgadir - 113734198")
+    res.send("Assignment 3: Abdalla Abdelgadir - 113734198")
 })
 
 app.get("/lego/sets", (req, res) => {
