@@ -28,7 +28,10 @@ app.use(express.static(path.join(__dirname, "public")));
   app.get("/about", (req, res) => {
     res.sendFile(path.join(__dirname, "views", "about.html"));
   });
-  
+
+  app.get("/404", (req, res) => {
+    res.sendFile(path.join(__dirname, "views", "404.html"));
+  });
   app.get("/", (req, res) => {
     res.send("Assignment 3: Abdalla Abdelgadir - 113734198");
   });
