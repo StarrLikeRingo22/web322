@@ -19,31 +19,35 @@ const app = express()
 app.set('view engine', 'ejs')
 
 const path = require('path')
-const PORT = process.env.PORT || 8080; // Vercel Link: 
+const PORT = process.env.PORT || 8080 // Vercel Link: 
 
-app.set("views", path.join(__dirname, "views"))
+// app.set("views", path.join(__dirname, "views"))
 
 app.use(express.static(path.join(__dirname, "public")))
 
-  app.get("/", (req, res) => {
-    res.render("home")
-  })
+  
+// Routes
+app.get("/", (req, res) => {
+  res.render("home")
+})
 
-  app.get("/about", (req, res) => {
-    res.render("about")
-  })
+app.get("/about", (req, res) => {
+  res.render("about")
+})
 
-  app.get("/", (req, res) => {
-    res.send("Assignment 4: Abdalla Abdelgadir - 113734198")
+app.get("/lego/sets", (req, res) => {
+  legoData.initialize().then(() => {
+    legoData.getAllSets().then((legoSets) => {
+      res.render("sets", { sets: legoSets })
+    }).catch((err) => {
+      res.status(500).render("500", { message: "Internal Server Error" })
+    })
+  }).catch((error) => {
+    res.status(500).render("500", { message: "Internal Server Error" })
   })
-
-  app.get("/404", (req, res) => {
-    res.render("404")
-  })
-
+})
 
 app.get("/lego/sets/:set_num", (req, res) => {
-
     legoData.getSetByNum(req.params.set_num).then((set) => {
       if (set) {
         res.render("set", { set: set })
@@ -52,58 +56,41 @@ app.get("/lego/sets/:set_num", (req, res) => {
       }
     }).catch((err) => {
       res.status(404).render("404", { message: "The requested Lego set was not found" })
-    }).catch((error) => {
-      res.status(500).render("500", { message: "Internal Server Error" })
     })
-})
-
-
-app.get("/lego/sets/", (req, res) => {
-  const theme = req.query.theme
-  legoData.initialize().then(() => {
-    if (theme) {
-      legoData.getSetsByTheme(theme).then((sets) => {
-        if (sets.length === 0) {
-          res.status(404).render("404", { message: "No Sets found for a matching theme" })
-        } else {
-          res.render("sets", { sets: sets })
-        }
-      }).catch((error) => {
-        res.status(500).render("500", { message: "Internal Server Error" })
-      })
-    } else {
-      legoData.getAllSets().then((sets) => {
-        res.render("sets", { sets: sets })
-      }).catch((error) => {
-        res.status(500).render("500", { message: "Internal Server Error" })
-      })
-    }
-  }).catch((error) => {
-    res.status(500).render("500", { message: "Internal Server Error" })
   })
-})
 
+  app.get("/lego/sets/:theme", (req, res) => {
+    legoData.initialize()
+      .then(() => legoData.getSetsByTheme(req.params.theme))
+      .then((sets) => {
+        if (sets && sets.length > 0) {
+          res.render("sets", { sets, theme: req.params.theme })
+        } else {
+          // Render 404 if no sets are found for the theme
+          res.status(404).render("404", { message: `No sets found for theme: ${req.params.theme}` })
+        }
+      })
+      .catch((err) => {
+        console.error("Error:", err); // Log the error for debugging
+        res.status(500).render("500", { message: "Internal Server Error" })
+      })
+  })
+  
+  
 
-
-
-app.get("/lego/sets/theme-demo", (req, res) => {
-    legoData.getSetsByTheme("town")
-        .then(sets => res.json(sets))
-        .catch(error => res.status(404).send(error))
-})
-
+// Custom 404 route
 app.use((req, res) => {
   res.status(404).render("404", { message: "Page not found" })
 })
 
+// Custom error handling middleware for internal server errors
 app.use((err, req, res, next) => {
   console.error(err.stack)
   res.status(500).render("500", { message: "Internal Server Error" })
 })
 
-
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`)
+  console.log(`Server is running on port ${PORT}`);
 })
 
 

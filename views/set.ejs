@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lego Collection</title>
-  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="/public/css/main.css" />
   <script>
     document.addEventListener("DOMContentLoaded", async ()=>{
         let res = await fetch("https://quotable.io/random");
@@ -18,7 +18,7 @@
   height: 470px;
 }
     .colored-text {
-      color: beige; /* Replace #ff0000 with the color code you desire */
+      color: rgb(216, 216, 101); /* Replace #ff0000 with the color code you desire */
     }
   </style>
 </head>
@@ -36,12 +36,6 @@
     <ul tabindex="0" class="menu menu-sm dropdown-content right-0 mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
       <li><a class="" href="/lego/sets">View Collection</a></li>
       <li><a class="" href="/about">About</a></li>
-    </ul>
-  </div>
-  <div class="navbar-center hidden sm:flex">
-    <ul class="menu menu-horizontal px-1">
-      <li><a class= "" href="/lego/sets">View Collection</a></li>
-      <li><a class= "" href="/about">About</a></li>
     </ul>
   </div>
 </div>
