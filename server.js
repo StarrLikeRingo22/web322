@@ -6,26 +6,24 @@
 *
 * https://www.senecacollege.ca/about/policies/academic-integrity-policy.html
 *
-* Name: Abdalla Abdelgadir       Student ID: 113734198      Date: 2024-11-04
+* Name: Abdalla Abdelgadir       Student ID: 113734198      Date: 2024-10-15
 *
-* Published URL: https://web322-5l9ea6luc-abdallas-projects-271c3cf9.vercel.app/
+* Published URL: ___________________________________________________________
 *
 ********************************************************************************/
 
-const legoData = require('./modules/legoSets') 
-const express = require('express')
-const app = express()
+const express = require('express');
+const path = require('path');
+const legoData = require("./modules/legoSets"); 
+const app = express();
+const PORT = process.env.PORT || 8080;
+app.use(express.static('public'));
+app.set('view engine', 'ejs');
 
-app.set('view engine', 'ejs')
-
-const path = require('path')
-const PORT = process.env.PORT || 8080 // Vercel Link: 
-
-// app.set("views", path.join(__dirname, "views"))
+app.set("views", path.join(__dirname, "views"))
 
 app.use(express.static(path.join(__dirname, "public")))
 
-  
 // Routes
 app.get("/", (req, res) => {
   res.render("home")
@@ -92,8 +90,6 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 })
-
-
 /*
 async function run() {
     await legoData.initialize() // testing functions
