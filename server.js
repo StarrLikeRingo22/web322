@@ -1,5 +1,5 @@
 /********************************************************************************
-* WEB322 – Assignment 04
+* WEB322 – Assignment 05
 *
 * I declare that this assignment is my own work in accordance with Seneca's
 * Academic Integrity Policy:
@@ -12,16 +12,17 @@
 *
 ********************************************************************************/
 
-const express = require('express');
-const path = require('path');
-const legoData = require("./modules/legoSets"); 
-const app = express();
-const PORT = process.env.PORT || 8080;
-app.use(express.static('public'));
-app.set('view engine', 'ejs');
+const express = require('express')
 
-app.set("views", path.join(__dirname, "views"))
+const path = require('path')
+const legoData = require("./modules/legoSets") 
+const app = express()
+const port = process.env.PORT || 8080
 
+
+
+app.set('view engine', 'ejs')
+app.use(express.urlencoded({ extended: true })) // Add this line for form data parsing
 app.use(express.static(path.join(__dirname, "public")))
 
 // Routes
@@ -33,63 +34,101 @@ app.get("/about", (req, res) => {
   res.render("about")
 })
 
-app.get("/lego/sets", (req, res) => {
-  legoData.initialize().then(() => {
-    legoData.getAllSets().then((legoSets) => {
-      res.render("sets", { sets: legoSets })
-    }).catch((err) => {
-      res.status(500).render("500", { message: "Internal Server Error" })
-    })
-  }).catch((error) => {
+app.get("/lego/sets", async (req, res) => {
+  const theme = req.query.theme
+
+  try {
+    const sets = theme ? await legoData.getSetsByTheme(theme) : await legoData.getAllSets()
+
+    if (sets.length === 0) {
+      res.status(404).render("404", { message: "No sets found for a matching theme" })
+    } else {
+      res.render("sets", { sets })
+    }
+  } catch (error) {
     res.status(500).render("500", { message: "Internal Server Error" })
-  })
+  }
+})
+
+app.get('/lego/addSet', async (req, res) => {
+  try {
+      const themes = await legoData.getAllThemes()
+      res.render('addSet', { themes })
+  } catch (err) {
+      res.render('500', { message: `Error loading themes: ${err.message}` })
+  }
+})
+
+app.post('/lego/addSet', async (req, res) => {
+  try {
+      await legoData.addSet(req.body)
+      res.redirect('/lego/sets')
+  } catch (err) {
+      res.render('500', { message: `I'm sorry, but we have encountered the following error: ${err}` })
+  }
 })
 
 app.get("/lego/sets/:set_num", (req, res) => {
-    legoData.getSetByNum(req.params.set_num).then((set) => {
-      if (set) {
-        res.render("set", { set: set })
-      } else {
-        res.status(404).render("404", { message: "The requested Lego set was not found" })
-      }
-    }).catch((err) => {
+  legoData.getSetByNum(req.params.set_num).then((set) => {
+    if (set) {
+      res.render("set", { set: set })
+    } else {
       res.status(404).render("404", { message: "The requested Lego set was not found" })
-    })
+    }
+  }).catch((err) => {
+    res.status(404).render("404", { message: "The requested Lego set was not found" })
   })
+})
 
-  app.get("/lego/sets/:theme", (req, res) => {
-    legoData.initialize()
-      .then(() => legoData.getSetsByTheme(req.params.theme))
-      .then((sets) => {
-        if (sets && sets.length > 0) {
-          res.render("sets", { sets, theme: req.params.theme })
-        } else {
-          // Render 404 if no sets are found for the theme
-          res.status(404).render("404", { message: `No sets found for theme: ${req.params.theme}` })
-        }
-      })
-      .catch((err) => {
-        console.error("Error:", err); // Log the error for debugging
-        res.status(500).render("500", { message: "Internal Server Error" })
-      })
-  })
-  
-  
+app.get('/lego/sets/:theme', async (req, res) => {
+  try {
+      const themeName = req.params.theme
+      const sets = await legoData.getSetsByTheme(themeName)
+      if (sets.length === 0) {
+          res.status(404).render('404', { message: `No sets found for the theme "${themeName}"` })
+      } else {
+          res.render('sets', { sets })
+      }
+  } catch (err) {
+      res.render('500', { message: `Error retrieving sets by theme: ${err.message}` })
+  }
+})
 
-// Custom 404 route
+app.get('/lego/set/:setId', async (req, res) => {
+  try {
+      const setId = req.params.setId
+      const themes = await legoData.getAllThemes()
+      const set = await legoData.getSetByNum(setId)
+      if (!set) {
+          res.status(404).render('404', { message: `No set found with ID "${setId}"` })
+      } else {
+          res.render('editSet', { set, themes })
+      }
+  } catch (err) {
+      res.render('500', { message: `Error retrieving set by ID: ${err.message}` })
+  }
+})
+
 app.use((req, res) => {
-  res.status(404).render("404", { message: "Page not found" })
+  res.status(404).render('404', { message: "The page you're looking for does not exist." })
 })
 
-// Custom error handling middleware for internal server errors
-app.use((err, req, res, next) => {
-  console.error(err.stack)
-  res.status(500).render("500", { message: "Internal Server Error" })
+app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`)
 })
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+app.get('/lego/editSet/:num', (req, res) => {
+  const setNum = req.params.num
+
+  Promise.all([legoSets.getSetByNum(setNum), legoSets.getAllThemes()])
+    .then(([setData, themeData]) => {
+      res.render('editSet', { set: setData, themes: themeData })
+    })
+    .catch((err) => {
+      res.status(404).render('404', { message: `Unable to retrieve data: ${err}` })
+    })
 })
+
 /*
 async function run() {
     await legoData.initialize() // testing functions
