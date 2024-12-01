@@ -38,22 +38,17 @@
                 </tr>
             </thead>
             <tbody>
-                <% sets.forEach(set => { %>
-                    <tr class="hover:bg-base-100">
-                      <td>
-                        <div class="card w-32 h-32 bg-base-100 shadow-md">
-                          <img class="w-full h-full object-cover rounded" src="<%= set.img_url %>" alt="<%= set.name %>">
-                        </div>
-                      </td>                
-                      <td><%= set.name %></td>
-                      <td><a href="/lego/sets?theme=<%= set.Theme.name %>" class="btn btn-xs btn-outline"><%= set.Theme.name %></a></td>
-                      <td><%= set.year %></td>                     
-                      <td><%= set.num_parts %></td>                      
-                      <td>
-                        <a href="/lego/set/<%= set.set_num %>" class="btn btn-sm bg-purple-500 hover:bg-purple-700">Details</a>
-                      </td>
+                <% sets.forEach(function(set) { %>
+                    <tr class="border-b">
+                      <td class="py-3 px-6"><img src="<%= set.img_url %>" alt="<%= set.name %>" class="w-20 h-auto object-contain"></td>
+                      <td class="py-3 px-6"><%= set.name %></td>
+                      <td class="py-3 px-6"><a href="/lego/sets?theme=<%= set.Theme.name %>" class="text-base-600 hover:underline"><%= set.Theme.name %></a></td>
+                      <td class="py-3 px-6"><%= set.year %></td>
+                      <td class="py-3 px-6"><%= set.num_parts %></td>
+                      <td class="py-3 px-6"><a href="/lego/set/<%= set.set_num %>" class="btn btn-primary rounded">Details</a></td>
+      
                     </tr>
-                  <% }); %>
+                  <% }) %>
                   
             </tbody>
         </table>

@@ -103,22 +103,24 @@ function initialize() {
       const sets = await Set.findAll({
         include: [Theme],
         where: {
-          '$Theme.name$': {
+          "$Theme.name$": {
             [Sequelize.Op.iLike]: `%${theme}%`,
           },
         },
-      })
+      });
   
       if (sets.length > 0) {
-        return sets
+        return sets;
       } else {
-        throw `No sets found for theme: ${theme}`
+        throw `No sets found for theme: ${theme}`;
       }
     } catch (error) {
-      console.error("Error getting sets by theme:", error)
-      throw error
+      console.error("Error getting sets by theme:", error);
+      throw error;
     }
   }
+  
+
   const addSet = async (setData) => {
     try {
       await Set.create(setData)
