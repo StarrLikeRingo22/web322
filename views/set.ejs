@@ -30,13 +30,15 @@
             <p class="mt-2"><strong>Year:</strong> <%= set.year %></p>
             <p><strong>Theme:</strong> <%= set.Theme.name %></p>
             <p><strong>Number of Parts:</strong> <%= set.num_parts %></p>
-
-            <div id="quote" class="mt-4 text-lg italic">"Loading quote..."</div>
+            <span id="quote"></span>
             <div id="author" class="text-right">-</div>
-            <a href="/lego/editSet/<%= set.set_num %>" class="btn btn-success mt-4">Edit</a>
+            <% if (session.user) { %>
+              <div>
+                  <a href="/lego/editSet/<%= set.set_num %>" class="btn btn-success mt-4">Edit</a>
+                  <button onclick="history.back(); return false;" class="btn btn-primary mt-4">Back</button>
+                </div>
+          <% } %>
         </div>
-
-        <button onclick="history.back(); return false;" class="btn btn-primary mt-4">Back</button>
     </div>
 </div>
 <script>
